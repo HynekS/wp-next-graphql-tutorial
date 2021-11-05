@@ -1,0 +1,8 @@
+[submodule "bedrock"]
+	path = bedrock
+	url = https://github.com/HynekS/wp-next-graphql-tutorial_backend
+	branch = part-01
+[submodule "nextjs"]
+	path = nextjs
+	url = https://github.com/HynekS/wp-next-graphql-tutorial_frontend
+	branch = part-01
