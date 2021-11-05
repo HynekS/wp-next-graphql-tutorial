@@ -55,9 +55,11 @@ Let's test if everything is working fine. Let's start our development environmen
 
 Hopefully, everything went well and we successfully installed a new WordPress instance. Let's log in our admin pages and activate the WP GraphQL plugin. A GraphQL link should appear at the sidebar, and a GraphiQL IDE link should appear on the upper bar:
 
-![alt](https://link)
+![Image of the WordPress admin pages after activating WP GraphQL plugin](assets/wp-graphql-tutorial-pt1-admin-page-graphiql-edited.png)
 
-Also, check the plugin settings (see image). We didn't need to change any of the defaults. Just notice the 'GraphQL Endpoint' option, because we will need this later while querying the from our Next app.
+Also, check the plugin settings (see image below). We didn't need to change any of the defaults. Just notice the 'GraphQL Endpoint' option, because we will need this later while querying the from our Next app.
+
+![Image of the default WP GraphQL plugin settings](assets/wp-graphql-tutorial-pt1-admin-page-settings-full-edited.png)
 
 One more thing: Right now, if we use a fresh new install with and empty database, there are barely any data to query (just the default 'Hello World' post), which is kind of dull. Let's create more posts! We'll use the 'Faker Press' plugin.
 
@@ -85,7 +87,9 @@ And we'll install the plugin the same way as the first one:
 composer update
 ```
 
-When the plugin is installed and activated, the 'FakerPress' menu item appears on the side bar. Let's go to the 'posts' submenu and create some posts and pages. I did create 12 posts from 'this month', but feel free to change that settings. I would just recommend to create _some_ posts.
+When the plugin is installed and activated, the 'FakerPress' menu item appears on the side bar. Let's go to the 'posts' submenu and create some posts. I did create 12 posts from 'this month', but feel free to change that settings. I would just recommend to create _some_ posts.
+
+![Image of the Faker Press settings](assets/wp-graphql-tutorial-pt1-admin-page-fakerpress-posts.png)
 
 ## Install Next.js
 
@@ -105,7 +109,7 @@ yarn create next-app --typescript
 
 ## Create a basic api
 
-In our Next.js project we create a new directory, `lib`, and in this library a new file, `api.js`. This file will contain a function that we'll use for querying the graphql endpoint created by WP GraphQL plugin.
+In our Next.js project we create a new directory, `lib`, and in this library a new file, `api.js` (you can go straightly for TypeScript and make it `api.ts`, but the compiler will likely complain about some `any` parameters – you can mute it for now using the `// @ts-nocheck` on the top of the file). This file will contain a function that we'll use for querying the graphql endpoint created by WP GraphQL plugin.
 
 ```tsx
 const API_URL = process.env.GRAPHQL_API_URL;
@@ -239,7 +243,7 @@ yarn dev
 
 Hopefully, we can see our first query result:
 
-**_image_**
+![Image of the homepage with our first queried data](assets/wp-graphql-tutorial-pt1-first-query-display.png)
 
 It doesn't look bad, but we want *actual links*, no just a JSON list of them. Let's import a `Link` component and create some… no surprise, links:
 
