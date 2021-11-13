@@ -1,18 +1,18 @@
-# Create a Next.js static site with Wordpress and GraphQL
+# Create a Next.js static site with Wordpress and GraphQL (WP GraphQL + Next.js, part 1)
 
-In this tutorial, we will create a JAMstack app by connecting three quite different libraries. On the backend, there is the old champ WordPress, tuned up by [Roots](https://roots.io). On the frontent, there is the wonder child, [Next.js](https://nextjs.org). Between those two, there is a great invention from a villain scientists lab, [GraphQL](https://graphql.org).
+In this tutorial, we will create a JAMstack app by connecting three quite different libraries. On the backend, there is the old champ WordPress, tuned up by [Roots](https://roots.io). On the frontend, there is the wonder child, [Next.js](https://nextjs.org). Between those two, there is a great invention from a villain scientists lab, [GraphQL](https://graphql.org).
 
 As it turned out, these three, while being different ages and languages, went along really well! Let's try yourself!
 
-## Prerequisities
+## Prerequisites
 
-This tutorial assumes that we have some experience with both WordPress and React (not neccessarily Next.js). It also assumes that we have already installed [Composer](https://getcomposer.org) and that we have some kind of LAMP stack development environment (e. g. [XAMPP](https://www.apachefriends.org/index.html), [Laragon](https://laragon.org/) or [Local](https://localwp.com/)) set up. We will aslo either need to create a new MySQL database for our WordPress project, or to use an existing one.
+This tutorial assumes that we have some experience with both WordPress and React (not necessarily Next.js). It also assumes that we have already installed [Composer](https://getcomposer.org) and that we have some kind of LAMP stack development environment (e. g. [XAMPP](https://www.apachefriends.org/index.html), [Laragon](https://laragon.org/) or [Local](https://localwp.com/)) set up. We will also need either to create a new MySQL database for our WordPress project, or to use an existing one.
 
 On the Next.js part, I will use [yarn](https://github.com/yarnpkg/berry) as a packet manager. While I was a long time satisfied npm user, I switched to yarn because it was able to get around some nasty `node-gyp` issues. But feel free to use whatever packet manager you like (just update the commands accordingly).
 
 ## Why Bedrock
 
-[Bedrock](https://roots.io/bedrock/) is an open source boilerplate for WordPress development. It significantly improves the developer experience and makes WordPress development feel quite up to date. It fully leverages the advantages of Composer by making WordPress and its plugins modules that can be easily installed and updated from a command line. It also stores the configuration in a separate `.env` files, which makes the configuration and version control much easier. The folder structure is also improved (user data like uploads are separated). After trying Bedrock, I definitelly don't want to go back to the 'out of the box' WordPress.
+[Bedrock](https://roots.io/bedrock/) is an open source boilerplate for WordPress development. It significantly improves the developer experience and makes WordPress development feel quite up to date. It fully leverages the advantages of Composer by making WordPress and its plugins **modules** that can be easily installed and updated from a command line. It also stores the configuration in a separate `.env` files, which makes the configuration and version control much easier. The folder structure is also improved (user data like uploads are separated). After trying Bedrock, I definitely don't want to go back to the 'out of the box' WordPress.
 
 ## Install and set up new WordPress/Bedrock project
 
@@ -22,13 +22,15 @@ First, let's create a new Bedrock project:
 composer create-project roots/bedrock
 ```
 
-In our freshly created project root directory, there is an `.env` file. Unlike the 'vanilla' WordPress release, where the sensitive data are basically 'hardcoded' in the `config.php` file (which brings the problem with version control), Bedrock follows the 'modern' approach where the sensitive data are stored in the envinronmental variables. Let's open the file and update it with our database credentials. Also, unlike 'vanilla' WordPress, our sites base url is stored here as as `WP_HOME` (which makes switching environments much smoother). Let's update it as well. Last but not least, it is definitely a good practice to generate the cryptographic salts, which are also stored in the `.env` file.
+In our freshly created project root directory, there is an `.env` file. Unlike the 'vanilla' WordPress release, where the sensitive data are basically 'hardcoded' in the `config.php` file (which brings the problem with version control), Bedrock follows the 'modern' approach where the sensitive data are stored in the environmental variables. Let's open the file and update it with our database credentials. Also, unlike 'vanilla' WordPress, our sites base url is stored here as as `WP_HOME` (which makes switching environments much smoother). Let's update it as well. Last but not least, it is definitely a good practice to generate the cryptographic salts, which are also stored in the `.env` file.
 
 ## Install the plugins
 
 After installing and setting up our project, let's open its root folder and install the **WP GraphQL** plugin, also using Composer. Let's open the `composer.json` file (it's in the root directory) and add `wpackagist-plugin/wp-graphql` to the list of dependencies (under `required`), like that:
 
 ```php
+// composer.json
+
 // ...
 "require": {
   "php": ">=7.1",
@@ -64,6 +66,8 @@ Also, check the plugin settings (see image below). We didn't need to change any 
 One more thing: Right now, if we use a fresh new install with and empty database, there are barely any data to query (just the default 'Hello World' post), which is kind of dull. Let's create more posts! We'll use the 'Faker Press' plugin.
 
 ```php
+// composer.json
+
 // ...
 "require": {
   "php": ">=7.1",
@@ -111,7 +115,9 @@ yarn create next-app --typescript
 
 In our Next.js project we create a new directory, `lib`, and in this library a new file, `api.js` (you can go straightly for TypeScript and make it `api.ts`, but the compiler will likely complain about some `any` parameters – you can mute it for now using the `// @ts-nocheck` on the top of the file). This file will contain a function that we'll use for querying the graphql endpoint created by WP GraphQL plugin.
 
-```tsx
+```javascript
+// lib/api.js
+
 const API_URL = process.env.GRAPHQL_API_URL;
 
 export async function fetchAPI(query, { variables } = {}) {
@@ -136,7 +142,9 @@ export async function fetchAPI(query, { variables } = {}) {
 
 Great, we have a fetcher function. Now, we need some actual query. If you've worked with **GraphiQL IDE** before, you know that one of its cool features is the ability to construct a query by just checking the sidebar items. Our first query will select title and slug of our posts:
 
-```tsx
+```javascript
+// lib/api.js
+
 const API_URL = process.env.GRAPHQL_API_URL;
 
 export async function fetchAPI(query, { variables } = {}) {
@@ -164,6 +172,8 @@ While we have our first query prepared, we need to actually use it somewhere. Le
 ## Create a home page
 
 ```tsx
+// pages/index.tsx
+
 const Home = () => {
   return (
     <div>
@@ -185,9 +195,11 @@ Beautiful, isn't it? Well, probably no. Let's add some styles to make it look ac
 }
 ```
 
-So where were we? All right, the query. We will use the `getStaticProps` function, which is quite verstile and works not only for static sites generation (SSG), but for client and server side rendering (CSR/SSR) as well. The get static props will call our prepared fetcher function to get the data. To displaying the actual data, we will – for now – utilize the `JSON.stringify()` method.
+So where were we? All right, the query. We will use the `getStaticProps` function, which is quite versatile and works not only for static sites generation (SSG), but for client and server side rendering (CSR/SSR) as well. The get static props will call our prepared fetcher function to get the data. To displaying the actual data, we will – for now – utilize the `JSON.stringify()` method.
 
 ```tsx
+// pages/index.tsx 
+
 import { getLatestPostsLinks } from "./../lib/api";
 
 const Home = ({ latestPosts } = {}) => {
@@ -214,9 +226,11 @@ export async function getStaticProps() {
 export default Home;
 ```
 
-Those of us who are using TypeScript may notice a complaint about an unclear prop type. For now, just tell TypeScript o ignere the file using `@ts-nocheck` directive. We will add typing later – in the second part of this tutorial.
+Those of us who are using TypeScript may notice a complaint about an unclear prop type. For now, just tell TypeScript to ignore the file using `@ts-nocheck` directive. We will add typing later – in the second part of this tutorial.
 
 ```tsx
+// pages/index.tsx
+
 // @ts-nocheck
 import { getLatestPostsLinks } from "./../lib/api";
 
@@ -229,7 +243,7 @@ const Home = ({ latestPosts } = {}) => {
 
 ## Try our api
 
-All right! For now, first check if the WordPress environment is running. You can do a simple test of the GraphQL endopint by simply trying to visit its url (e. g. http://127.0.0.1/wp/graphql). You should get a page with a JSON object containig an error caused by missing arguments, like that:
+All right! For now, first check if the WordPress environment is running. You can do a simple test of the GraphQL endpoint by simply trying to visit its url (e. g. `http://127.0.0.1/wp/graphql`). You should get a page with a JSON object containing an error caused by missing arguments, like that:
 
 ```
 {"errors":[{"message":"GraphQL Request must include at least one of those two parameters: \"query\" or \"queryId\"","extensions":{"category":"request"}}],"extensions":{"debug":[{"type":"DEBUG_LOGS_INACTIVE","message":"GraphQL Debug logging is not active. To see debug logs, GRAPHQL_DEBUG must be enabled."}]}}
@@ -248,6 +262,8 @@ Hopefully, we can see our first query result:
 It doesn't look bad, but we want *actual links*, no just a JSON list of them. Let's import a `Link` component and create some… no surprise, links:
 
 ```tsx
+// pages/index.tsx
+
 // @ts-nocheck
 import Link from "next/link";
 
@@ -301,6 +317,8 @@ The `slug` inside brackets can bee seen as a variable, a prop, that will be even
 We add a new function to our api, which will be querying all posts that have slug. It is very similar to our first query, but we specify a quite high exact number of queried items (WP GraphQL is quite restrictive about a large amount of data queried at once to prevent 'server meltdowns'):
 
 ```tsx
+// lib/api.js
+
 const API_URL = "http://127.0.0.1/wp/graphql";
 
 export async function fetchAPI(query, { variables } = {}) {
@@ -340,6 +358,8 @@ Now, let's create a template for out post. For now, the post itself will be show
 What is new here is the `getStaticPaths` function. What does it do? It builds a list of *paths* (or relative urls, if you wish) that will point to our new `Post` template. It also utilizes a fetcher function, which gets the post nodes with slugs. Then, we simply map over the nodes and construct the paths:
 
 ```tsx
+// pages/posts/[slug].tsx
+
 // @ts-nocheck
 import { getAllPostsWithSlug, getPost } from "../../lib/api";
 
@@ -372,9 +392,11 @@ export async function getStaticPaths() {
 export default Post;
 ```
 
-Hopefuly, we can see our post – but only like a JSON string. Let's make it pretty, and let's add a link to a homepage, so we can browse our posts easily:
+Hopefully, we can see our post – but only like a JSON string. Let's make it pretty, and let's add a link to a homepage, so we can browse our posts easily:
 
 ```tsx
+// pages/posts/[slug].tsx
+
 // @ts-nocheck
 import Link from "next/link";
 
@@ -413,6 +435,8 @@ yarn global add serve
 When the *serve* is installed, let's open the `package.json` file and add two scripts (this is optional – if you are a UNIX based shell user, you can run them directly):
 
 ```json
+// package.json
+
 // ...
   "scripts": {
     "dev": "next dev",
@@ -433,7 +457,7 @@ Let's try it:
 yarn static
 ```
 
-Now, hopefully, our fully static, blazingly fast site is running at `http://localhost:5000`.
+Now, hopefully, our fully static, blazing fast site is running at `http://localhost:5000`.
 
 ## Expand that tutorial
 
@@ -442,6 +466,6 @@ If you are in the mood, you can try to enhance this project by yourself, e. g.:
 - by creating a set of WordPress *pages*, creating a `[slug].tsx` template fot them and linking them on the homepage,
 - by creating a new menu in WordPress admin pages and adding it to the homepage.
 
-This tutorial has a second part, where we will lear how to add autogenerated types to our queries and use them in our templates.
+This tutorial has a [second part](https://github.com/HynekS/wp-next-graphql-tutorial/tree/part-02), where we will lear how to add auto-generated types to our queries and use them in our templates.
 
 👍 Enjoy!
