@@ -1,4 +1,4 @@
-# How to Type our GraphQL queries (WP GraphQL + NextJS, part 2)
+# How to type our GraphQL queries (WP GraphQL + Next.js, part 2)
 
 This is the second part of the '_Create a Next.js static site with Wordpress and GraphQL_' tutorial. In the [first part](https://github.com/HynekS/wp-next-graphql-tutorial), we have learned how to connect WordPress (as a 'backend') and Next.js (as a 'frontend') using GraphQL queries and how to export our app as a static site.
 
@@ -12,19 +12,19 @@ git clone --recurse-submodules https://github.com/HynekS/wp-next-graphql-tutoria
 
 You will also need to set up a few more things, though:
 
-### Wordpress
+### WordPress
 
 You will need to create a database for WordPress. In In the `/bedrock` directory, you'll need to rename the `.env.example` file to`.env`. In the `.env` file, you'll need to update your database credentials and the base url of the site. For installing all dependencies, you'll need to run `composer install --no-scripts` command. You'll need to activate the '**WP GraphQL**' plugin and flush permalinks (Settings -> Permalinks, Save Changes). It's probably a good idea to create a few posts using **Faker Press** plugin (or manually, if you feel like it). For more details, check the [first part](https://github.com/HynekS/wp-next-graphql-tutorial).
 
 ### Next.js
 
-In the `/nextjs` folder, run `yarn install`. When all the dependencies are installed (and PHP/MySQL servers for WordPress are up and running) start NextJS by `yarn dev` command.
+In the `/nextjs` folder, run `yarn install`. When all the dependencies are installed (and PHP/MySQL servers for WordPress are up and running) start Next.js by `yarn dev` command.
 
-## Install and initialize the GraphQL Code generator
+## Install and initialize the GraphQL code generator
 
 The GraphQL Code generator install is requiring a couple of steps. Let's go through it:
 
-### Instal the core modules
+### Instal core modules
 
 First, we need to install the core dependencies:
 
@@ -112,9 +112,9 @@ export async function getLatestPosts() {
 
 (I've noticed that after inserting the `/* GraphQL */` hint, the query string was recognized by VS Code as a proper GraphQL query and changes its color. But it might depend on the actual editor settings.)
 
-This method of tagging strings that are actually GraphQL queries is being referred to as a [GraphQL Tag Pluck](https://www.graphql-code-generator.com/docs/getting-started/documents-field#graphql-tag-pluck) – hence the header.
+This method of tagging strings that are actually GraphQL queries is being referred to as a [GraphQL Tag Pluck](https://www.graphql-code-generator.com/docs/getting-started/documents-field#graphql-tag-pluck) – hence the header caption.
 
-## Update the .gitignore file
+## Update the `.gitignore` file
 
 When running the codegen, we will generate some files that we probably don't want to be included in our version control. We'll prevent that by adding these  lines to `.gitignore`:
 
@@ -126,7 +126,7 @@ graphql.schema.json
 generated/
 ```
 
-## Run the codegen script
+## Run the `codegen` script
 
 Great! Everything should be set up now. Let's try our `codegen` script.
 
@@ -205,7 +205,7 @@ export type PostQuery = {
 
 ## Utilize the types in our api
 
-For simplicity sake, we left the `/lib/api.js` as a plain javascript file tn the first part ot the tutorial. Now, it's the time to make a step forward and convert it to TypeScript – simply by changing its extension: `mv lib/api.js lib/api.ts`. The compiler may have some complaints (about parameters without types) – don't worry, we'll fix that soon.
+For simplicity sake, we left the `/lib/api.js` as a plain javascript file in the first part ot the tutorial. Now, it's the time to make a step forward and convert it to TypeScript – simply by changing its extension: `mv lib/api.js lib/api.ts`. The compiler may have some complaints (about parameters without types) – don't worry, we'll fix that soon.
 
 ### Import and arrange types for our queries
 
@@ -241,11 +241,11 @@ export async function fetchAPI(query, { variables }) {
 // ...
 ```
 
-### Add types the fetchApi function
+### Add types to the `FetchApi` function
 
 Now, let's type out `fetchAPI` function. It will accept a generic type `T` with the constraint that it is a `T` of the `Query` type: `<T extends Query>`. The functions returns that `T` type wrapped in a Promise: `Promise<T>`.
 
-Also, let's add types to its parameters: the `query` is simply a `string`, the options object (now anonymous because of the destructuring) will take the `Options` type. We'll also give it a default argument – an empty object `{}`.
+Also, let's add types to its parameters: the `query` is simply a `string`, the the object exposing the variables property will take the `Options` type. We'll also give it a default argument – an empty object `{}`.
 
 ```typescript
 // lib/api.ts
@@ -400,7 +400,7 @@ export async function getPost(slug: PostQueryVariables["id"]) {
 
 Great! We already have typed the data we're querying in our api. But the page templates doesn't know the types yet. We need to do a one last step.
 
-## Import and apply our types
+### Import and apply our types
 
 Let's import `InferGetStaticPropsType` type utility from "next" module. Then, we'll simply use that utility to infer the return type of the `getStaticProps` function:
 
@@ -453,7 +453,7 @@ Now, we should be able to see the inferred type when hovering over the `LatestPo
 
 But TypeScript compiler is not happy! It is spawning wavy red underlines everywhere!
 
-Don't panic. TypeScript in a strict mode (which is a default for NextJS v12) can be pretty harsh. The problem is that in our inferred `LatestPosts`, very little of the properties is guaranteed. Therefore, we need to update our code so it wont't crash at runtime with timeless `Uncaught TypeError: Cannot read property 'X' of undefined` (or null).
+Don't panic. TypeScript in a strict mode (which is a default for Next.js v12) can be pretty harsh. The problem is that in our inferred `LatestPosts`, very little of the properties is guaranteed. Therefore, we need to update our code so it wont't crash at runtime with the well known `Uncaught TypeError: Cannot read property 'X' of undefined/null` error.
 
 Since our component is simple, all we'll need is [nullish coalescence](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator) (`??`) and [optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) (`?.`) operators:
 
@@ -551,6 +551,6 @@ export async function getStaticPaths() {
 export default Post;
 ```
 
-Well, that's all for now. Hope you've learned something useful while reading this. You can check the final code in my github repo.
+Well, that's all for now. Hope you've learned something useful while reading this. You can check the final code in my [github repo](https://github.com/HynekS/wp-next-graphql-tutorial_frontend/tree/part-02).
 
 👍 Enjoy!
